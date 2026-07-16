@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>四级通关 · 拼写训练</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+      background: #0a0a1a;
+      color: #e0e0f0;
+      min-height: 100vh;
+    }
+    .nav {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 20px; background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.05); overflow-x: auto;
+    }
+    .nav a {
+      color: #667799; text-decoration: none; font-size: 14px;
+      padding: 6px 14px; border-radius: 8px; transition: 0.3s; cursor: pointer; white-space: nowrap;
+    }
+    .nav a:hover { color: #c0ccee; background: rgba(255,255,255,0.05); }
+    .nav a.active { color: white; background: rgba(63,110,240,0.2); }
+    .nav .brand { font-weight: 700; font-size: 16px; color: white; margin-right: 16px; }
+    .nav .brand span { color: #3f6ef0; }
+    .page { display: none; padding: 24px 20px; max-width: 660px; margin: 0 auto; }
+    .page.active { display: block; }
+    .text-center { text-align: center; }
+    .flex-center { display: flex; justify-content: center; gap: 10px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-20 { margin-top: 20px; }
+    .btn-primary {
+      padding: 14px 48px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, #3f6ef0, #6c3ff0);
+      color: white; font-size: 17px; font-weight: 600; cursor: pointer; transition: 0.3s;
+    }
+    .btn-primary:hover { transform: scale(1.03); box-shadow: 0 8px 30px rgba(63,110,240,0.35); }
+    .btn-secondary {
+      padding: 10px 28px; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; background: transparent; color: #8899bb; font-size: 14px; cursor: pointer; transition: 0.3s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #c0ccee; }
+    .btn-small {
+      padding: 6px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04); color: #8899bb; cursor: pointer; font-size: 12px; transition: 0.3s;
+    }
+    .btn-small:hover { background: rgba(255,255,255,0.08); color: white; }
+    .btn-small.active { background: rgba(63,110,240,0.2); border-color: #3f6ef0; color: white; }
+    .btn-success {
+      padding: 10px 28px; border: none; border-radius: 10px;
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s;
+    }
+    .btn-success:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(0,206,201,0.3); }
+    .btn-danger {
+      padding: 6px 16px; border-radius: 8px; border: 1px solid rgba(255,80,80,0.2);
+      background: rgba(255,80,80,0.08); color: #ff6b6b; cursor: pointer; font-size: 12px; transition: 0.3s;
+    }
+    .btn-danger:hover { background: rgba(255,80,80,0.15); }
+
+    /* ===== 首页 ===== */
+    .hero { text-align: center; padding: 24px 0 16px; }
+    .hero h1 {
+      font-size: 32px;
+      background: linear-gradient(135deg, #a8c0ff, #3f6ef0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p { color: #667799; margin-top: 4px; font-size: 14px; }
+    .hero .streak {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+      padding: 5px 16px; background: rgba(255,165,0,0.1);
+      border: 1px solid rgba(255,165,0,0.2); border-radius: 20px;
+      font-size: 13px; color: #ffa500;
+    }
+    .goal-section {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 20px; margin: 16px 0; text-align: center;
+    }
+    .goal-section .label { color: #8899bb; font-size: 13px; margin-bottom: 10px; }
+    .goal-section .goal-input-wrap {
+      display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px;
+    }
+    .goal-section .goal-input-wrap input[type="number"] {
+      width: 72px; padding: 8px 10px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06);
+      color: white; font-size: 20px; text-align: center; outline: none;
+    }
+    .goal-section .goal-input-wrap input[type="number"]:focus { border-color: #3f6ef0; }
+    .goal-presets { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .goal-presets button {
+      padding: 4px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03); color: #667799; cursor: pointer; font-size: 12px; transition: 0.3s;
+    }
+    .goal-presets button:hover, .goal-presets button.active { border-color: #3f6ef0; color: white; }
+    .today-progress {
+      display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(63,110,240,0.1), rgba(108,63,240,0.06));
+      border: 1px solid rgba(63,110,240,0.15); border-radius: 14px; margin: 12px 0;
+    }
+    .today-progress .info { flex: 1; }
+    .today-progress .info .big { font-size: 36px; font-weight: 700; color: white; }
+    .today-progress .info .sub { font-size: 13px; color: #667799; margin-top: 2px; }
+    .today-progress .bar {
+      width: 100px; height: 100px; border-radius: 50%; flex-shrink: 0;
+      background: conic-gradient(#3f6ef0 var(--pct, 0%), rgba(255,255,255,0.06) 0);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .today-progress .bar .inner {
+      width: 76px; height: 76px; border-radius: 50%; background: #0a0a1a;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #a8c0ff;
+    }
+    .mode-selector {
+      display: flex; gap: 8px; justify-content: center; margin: 16px 0;
+    }
+    .mode-selector button {
+      padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03); color: #667799; cursor: pointer;
+      font-size: 14px; transition: 0.3s; text-align: center; line-height: 1.3;
+    }
+    .mode-selector button:hover { border-color: rgba(63,110,240,0.3); color: #c0ccee; }
+    .mode-selector button.active { background: rgba(63,110,240,0.15); border-color: #3f6ef0; color: white; }
+    .mode-selector button .mode-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+    .mode-selector button .mode-label { font-size: 13px; }
+    .mode-selector button .mode-desc { font-size: 11px; color: #445; display: block; margin-top: 2px; }
+    .mode-selector button.active .mode-desc { color: #667799; }
+
+    /* ===== 关卡列表 ===== */
+    .level-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .level-item {
+      display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; cursor: pointer; transition: 0.3s;
+    }
+    .level-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(63,110,240,0.2); }
+    .level-item.locked { opacity: 0.4; cursor: not-allowed; }
+    .level-item.locked:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }
+    .level-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; background: rgba(63,110,240,0.15); color: #3f6ef0; flex-shrink: 0; }
+    .level-item.locked .level-icon { background: rgba(255,255,255,0.05); color: #445; }
+    .level-info { flex: 1; }
+    .level-info .name { font-size: 15px; font-weight: 600; color: #e0e0f0; }
+    .level-info .desc { font-size: 12px; color: #667799; margin-top: 2px; }
+    .level-info .bar-wrap { height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+    .level-info .bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3f6ef0, #6c3ff0); transition: width 0.5s; }
+    .level-status { font-size: 13px; color: #667799; white-space: nowrap; }
+
+    /* ===== 学习页 ===== */
+    .study-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .study-header .back { cursor: pointer; color: #667799; font-size: 14px; }
+    .study-header .back:hover { color: white; }
+    .study-header .prog { font-size: 14px; color: #667799; }
+    .study-header .prog strong { color: #c0ccee; }
+    .study-mode-tabs { display: flex; gap: 4px; margin-bottom: 16px; background: rgba(255,255,255,0.03); border-radius: 10px; padding: 3px; }
+    .study-mode-tabs button {
+      flex: 1; padding: 8px 12px; border: none; border-radius: 8px;
+      background: transparent; color: #667799; cursor: pointer; font-size: 13px; transition: 0.3s;
+    }
+    .study-mode-tabs button.active { background: rgba(63,110,240,0.2); color: white; }
+    .study-mode-tabs button:hover:not(.active) { color: #c0ccee; }
+
+    /* ===== 浏览模式 ===== */
+    #browseArea { text-align: center; padding: 10px 0; }
+    #browseArea .word { font-size: 44px; font-weight: 700; color: white; letter-spacing: 2px; margin-bottom: 8px; }
+    #browseArea .phonetic { font-size: 17px; color: #667799; margin-bottom: 4px; }
+    #browseArea .meaning { font-size: 22px; color: #a8c0ff; margin-bottom: 6px; }
+    #browseArea .sentence-box {
+      font-size: 14px; color: #8899bb;
+      max-width: 480px; margin: 14px auto 0; line-height: 1.7;
+      padding: 14px 18px; background: rgba(255,255,255,0.04);
+      border-radius: 10px; border-left: 3px solid rgba(63,110,240,0.3); text-align: left;
+    }
+    #browseArea .sentence-box .en { font-style: italic; }
+    #browseArea .sentence-box .zh { color: #667799; font-size: 13px; margin-top: 4px; }
+    .browse-nav { display: flex; justify-content: center; gap: 16px; margin-top: 20px; }
+    .browse-nav button {
+      width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: white; font-size: 20px; cursor: pointer; transition: 0.3s;
+    }
+    .browse-nav button:hover { background: rgba(63,110,240,0.2); border-color: #3f6ef0; }
+    .browse-nav .count { align-self: center; color: #667799; font-size: 13px; }
+
+    /* ===== 拼写模式 ===== */
+    #spellArea { text-align: center; padding: 10px 0; }
+    #spellArea .hint-meaning { font-size: 20px; color: #a8c0ff; margin-bottom: 4px; }
+    #spellArea .hint-phonetic { font-size: 14px; color: #667799; margin-bottom: 4px; }
+    #spellArea .hint-sentence { font-size: 13px; color: #667799; font-style: italic; margin: 10px auto; line-height: 1.5; max-width: 420px; padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    #spellArea .hint-char { font-size: 12px; color: #445; margin-bottom: 10px; }
+    .spell-row { display: flex; gap: 10px; justify-content: center; align-items: center; }
+    .spell-row input {
+      flex: 1; max-width: 320px; padding: 14px 18px; border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+      color: white; font-size: 20px; text-align: center; outline: none; letter-spacing: 2px; transition: 0.3s;
+    }
+    .spell-row input:focus { border-color: #3f6ef0; }
+    .spell-row input.correct { border-color: #00b894; background: rgba(0,184,148,0.1); }
+    .spell-row input.wrong { border-color: #ff6b6b; background: rgba(255,107,107,0.1); }
+    .spell-row button { padding: 14px 28px; border: none; border-radius: 12px; background: linear-gradient(135deg, #3f6ef0, #6c3ff0); color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+    .spell-row button:hover { transform: scale(1.03); }
+    .spell-feedback { margin-top: 14px; font-size: 15px; min-height: 26px; }
+    .spell-feedback.correct { color: #00b894; }
+    .spell-feedback.wrong { color: #ff6b6b; }
+    .spell-feedback .right-ans { color: #ffd93d; font-weight: 600; }
+
+    /* ===== 选择题模式 ===== */
+    #quizArea { text-align: center; padding: 10px 0; }
+    #quizArea .q-meaning { font-size: 22px; color: #a8c0ff; margin-bottom: 4px; }
+    #quizArea .q-sentence { font-size: 14px; color: #667799; font-style: italic; margin: 10px auto; line-height: 1.5; max-width: 420px; padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    #quizArea .q-hint { font-size: 13px; color: #445; margin-bottom: 14px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; max-width: 400px; margin: 0 auto; }
+    .quiz-options button {
+      padding: 14px 18px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03); color: #c0ccee; font-size: 17px;
+      cursor: pointer; transition: 0.3s; text-align: center;
+    }
+    .quiz-options button:hover { border-color: rgba(63,110,240,0.3); background: rgba(63,110,240,0.06); }
+    .quiz-options button.selected-correct { border-color: #00b894; background: rgba(0,184,148,0.1); color: #00b894; }
+    .quiz-options button.selected-wrong { border-color: #ff6b6b; background: rgba(255,107,107,0.1); color: #ff6b6b; }
+    .quiz-options button.show-correct { border-color: #00b894; background: rgba(0,184,148,0.05); color: #00b894; }
+    .quiz-feedback { margin-top: 12px; font-size: 15px; min-height: 24px; }
+    .quiz-feedback.correct { color: #00b894; }
+    .quiz-feedback.wrong { color: #ff6b6b; }
+
+    /* ===== 关卡完成 ===== */
+    .level-done { text-align: center; padding: 30px 0; }
+    .level-done .big-icon { font-size: 64px; margin-bottom: 12px; }
+    .level-done h2 { color: white; font-size: 26px; }
+    .level-done p { color: #667799; margin: 8px 0 20px; }
+    .level-done .row { display: flex; justify-content: center; gap: 36px; margin: 20px 0; }
+    .level-done .row .item { text-align: center; }
+    .level-done .row .num { font-size: 32px; font-weight: 700; color: #3f6ef0; }
+    .level-done .row .num.green { color: #00b894; }
+    .level-done .row .num.red { color: #ff6b6b; }
+    .level-done .row .lbl { font-size: 12px; color: #667799; margin-top: 4px; }
+
+    /* ===== 错词本 ===== */
+    .wrong-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .wrong-header h2 { font-size: 20px; }
+    .wrong-header .count { color: #667799; font-size: 14px; }
+    .wrong-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,107,107,0.04); border: 1px solid rgba(255,107,107,0.1); border-radius: 10px; margin-bottom: 6px; }
+    .wrong-item .w { color: #ff6b6b; font-weight: 600; font-size: 15px; }
+    .wrong-item .m { color: #667799; font-size: 13px; }
+    .wrong-item .t { color: #445; font-size: 12px; }
+    .wrong-empty { text-align: center; padding: 40px 0; color: #445; font-size: 15px; }
+
+    /* ===== 统计 ===== */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .stat-card { padding: 18px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); text-align: center; }
+    .stat-card .num { font-size: 28px; font-weight: 700; color: white; }
+    .stat-card .lbl { font-size: 12px; color: #667799; margin-top: 4px; }
+    .stat-card .num.blue { color: #3f6ef0; }
+    .stat-card .num.green { color: #00b894; }
+    .stat-card .num.orange { color: #ffa500; }
+    .stat-card .num.red { color: #ff6b6b; }
+
+    .toggle-wrap { display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: rgba(255,255,255,0.03); border-radius: 12px; margin: 14px 0; }
+    .toggle-wrap label { flex: 1; font-size: 14px; color: #c0ccee; }
+    .toggle { width: 44px; height: 24px; border-radius: 12px; background: rgba(255,255,255,0.1); cursor: pointer; position: relative; transition: 0.3s; flex-shrink: 0; }
+    .toggle.on { background: #3f6ef0; }
+    .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: white; transition: 0.3s; }
+    .toggle.on::after { left: 22px; }
+
+    .tip-section {
+      margin-top: 16px; padding: 16px 18px; background: rgba(255,165,0,0.04);
+      border: 1px solid rgba(255,165,0,0.1); border-radius: 12px; font-size: 13px; line-height: 1.7;
+    }
+    .tip-section b { color: #ffa500; }
+    .tip-section code {
+      padding: 1px 6px; background: rgba(255,255,255,0.06); border-radius: 4px; font-size: 12px; color: #c0ccee;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="brand">📖 CET<span>4</span></div>
+  <a class="active" onclick="showPage('home')">首页</a>
+  <a onclick="showPage('levels')">关卡</a>
+  <a onclick="showPage('wrongBook')">错词本</a>
+  <a onclick="showPage('stats')">统计</a>
+</div>
+
+<!-- ===== 首页 ===== -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <h1>四级通关</h1>
+    <p>看一遍 · 拼出来 · 真正记住</p>
+    <div class="streak">🔥 连续学习 <span id="streakNum">0</span> 天</div>
+  </div>
+  <!-- 每日目标 -->
+  <div class="goal-section">
+    <div class="label">📅 每日学习目标</div>
+    <div class="goal-input-wrap">
+      <input type="number" id="dailyGoalInput" value="10" min="1" max="100">
+      <span style="color:#667799;font-size:14px;">词/天</span>
+    </div>
+    <div class="goal-presets">
+      <button onclick="setDailyGoal(5)">5</button>
+      <button class="active" onclick="setDailyGoal(10)">10</button>
+      <button onclick="setDailyGoal(15)">15</button>
+      <button onclick="setDailyGoal(20)">20</button>
+      <button onclick="setDailyGoal(30)">30</button>
+      <button onclick="setDailyGoal(50)">50</button>
+    </div>
+  </div>
+  <!-- 今日进度 -->
+  <div class="today-progress">
+    <div class="info">
+      <div class="big" id="homeTodayCount">0</div>
+      <div class="sub" id="homeTodaySub">今日已学 · 目标 <span id="homeGoalDisplay">10</span> 词</div>
+    </div>
+    <div class="bar" id="homeRing">
+      <div class="inner" id="homePct">0%</div>
+    </div>
+  </div>
+  <!-- 学习模式 -->
+  <div style="font-size:14px;color:#8899bb;margin:6px 0 4px;">选择学习模式</div>
+  <div class="mode-selector">
+    <button class="active" onclick="setMode('browse')">
+      <span class="mode-icon">📖</span>
+      <span class="mode-label">浏览</span>
+      <span class="mode-desc">快速过一遍</span>
+    </button>
+    <button onclick="setMode('spell')">
+      <span class="mode-icon">✍️</span>
+      <span class="mode-label">拼写</span>
+      <span class="mode-desc">手动默写</span>
+    </button>
+    <button onclick="setMode('quiz')">
+      <span class="mode-icon">🎯</span>
+      <span class="mode-label">选择题</span>
+      <span class="mode-desc">四选一</span>
+    </button>
+  </div>
+  <div class="text-center">
+    <button class="btn-primary" onclick="continueStudy()" style="width:100%;">🚀 开始学习</button>
+  </div>
+  <!-- 学习方法建议 -->
+  <div class="tip-section">
+    <b>💡 高效学习法</b><br>
+    ① <b>浏览模式</b> — 快速过一遍，混个眼熟，了解整体难度<br>
+    ② <b>拼写模式</b> — 看→记→写，主动回忆，效果最好<br>
+    ③ <b>选择题模式</b> — 巩固训练，从选项中辨认正确单词<br>
+    🔄 建议三种模式搭配使用，每个单词过 <b>3遍</b> 以上<br>
+    🎯 每天先复习<b>错词本</b>，再学新词
+  </div>
+</div>
+
+<!-- ===== 关卡页 ===== -->
+<div id="page-levels" class="page">
+  <h2 style="font-size:20px;margin-bottom:4px;">🗺️ 选择关卡</h2>
+  <p style="color:#667799;font-size:13px;margin-bottom:16px;">按顺序通关，完成后解锁下一关</p>
+  <div id="levelList" class="level-grid"></div>
+</div>
+
+<!-- ===== 学习页 ===== -->
+<div id="page-study" class="page">
+  <div class="study-header">
+    <span class="back" onclick="leaveStudy()">← 返回</span>
+    <span class="prog" id="studyProgress">第 <strong>1</strong> / <strong>10</strong></span>
+  </div>
+  <div class="study-mode-tabs">
+    <button onclick="switchStudyMode('browse')" id="tabBrowse">📖 浏览</button>
+    <button onclick="switchStudyMode('spell')" id="tabSpell">✍️ 拼写</button>
+    <button onclick="switchStudyMode('quiz')" id="tabQuiz">🎯 选择</button>
+  </div>
+
+  <!-- 浏览模式 -->
+  <div id="browseArea">
+    <div class="word" id="bWord">abandon</div>
+    <div class="phonetic" id="bPhonetic">/əˈbændən/</div>
+    <div class="meaning" id="bMeaning">v. 放弃；遗弃</div>
+    <div class="sentence-box">
+      <div class="en" id="bSentence">They had to abandon the project.</div>
+      <div class="zh" id="bSentenceZh">他们不得不放弃这个项目。</div>
+    </div>
+    <div><button class="btn-voice" onclick="speakBrowseWord()" style="margin-top:12px;padding:8px 22px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#a8c0ff;cursor:pointer;font-size:14px;transition:0.3s;">🔊 听发音</button></div>
+    <div class="browse-nav">
+      <button onclick="browsePrev()">◀</button>
+      <span class="count" id="browseCount">1 / 45</span>
+      <button onclick="browseNext()">▶</button>
+    </div>
+  </div>
+
+  <!-- 拼写模式 -->
+  <div id="spellArea" style="display:none;">
+    <div class="hint-meaning" id="sMeaning">v. 放弃；遗弃</div>
+    <div class="hint-phonetic" id="sPhonetic">/əˈbændən/</div>
+    <div class="hint-sentence" id="sSentence">They had to abandon the project.</div>
+    <div class="hint-char" id="sCharHint">共 7 个字母</div>
+    <div class="spell-row">
+      <input type="text" id="spellInput" placeholder="请输入..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button onclick="checkSpell()">确认</button>
+    </div>
+    <div class="spell-feedback" id="spellFeedback"></div>
+    <div class="flex-center mt-12">
+      <button class="btn-small" id="btnReveal" onclick="revealWord()" style="display:none;">👀 显示答案</button>
+      <button class="btn-primary" id="btnNextSpell" onclick="nextStudyWord()" style="display:none;">下一个 →</button>
+    </div>
+  </div>
+
+  <!-- 选择题模式 -->
+  <div id="quizArea" style="display:none;">
+    <div class="q-meaning" id="qMeaning">v. 放弃；遗弃</div>
+    <div class="q-sentence" id="qSentence">They had to abandon the project.</div>
+    <div class="q-hint">👆 选择正确的英文单词</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div class="flex-center mt-12">
+      <button class="btn-primary" id="btnNextQuiz" onclick="nextQuizWord()" style="display:none;">下一个 →</button>
+    </div>
+  </div>
+
+  <!-- 关卡完成 -->
+  <div id="levelDone" style="display:none;">
+    <div class="level-done">
+      <div class="big-icon">🎉</div>
+      <h2 id="doneTitle">关卡完成！</h2>
+      <p id="doneSub">太棒了，继续加油！</p>
+      <div class="row">
+        <div class="item"><div class="num" id="doneTotal">0</div><div class="lbl">本关词数</div></div>
+        <div class="item"><div class="num green" id="doneCorrect">0</div><div class="lbl">拼写正确</div></div>
+        <div class="item"><div class="num red" id="doneWrong">0</div><div class="lbl">拼写错误</div></div>
+      </div>
+      <div class="flex-center">
+        <button class="btn-secondary" onclick="leaveStudy()">返回关卡</button>
+        <button class="btn-primary" id="btnNextLevel" onclick="goNextLevel()" style="display:none;">下一关 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 错词本 ===== -->
+<div id="page-wrongBook" class="page">
+  <div class="wrong-header">
+    <h2>📕 错词本</h2>
+    <span class="count" id="wrongTotal">共 0 个</span>
+  </div>
+  <div class="flex-center" style="margin-bottom:14px;">
+    <button class="btn-small" onclick="practiceWrong()">🔄 复习错词</button>
+    <button class="btn-danger" onclick="clearWrong()">🗑️ 清空错词本</button>
+  </div>
+  <div id="wrongList"></div>
+</div>
+
+<!-- ===== 统计页 ===== -->
+<div id="page-stats" class="page">
+  <h2 style="font-size:20px;margin-bottom:4px;">📊 学习统计</h2>
+  <p style="color:#667799;font-size:13px;margin-bottom:16px;">你的四级备考进度</p>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num blue" id="statTotalLearned">0</div><div class="lbl">累计学会</div></div>
+    <div class="stat-card"><div class="num green" id="statAccuracy">0%</div><div class="lbl">总正确率</div></div>
+    <div class="stat-card"><div class="num orange" id="statToday">0</div><div class="lbl">今日学习</div></div>
+    <div class="stat-card"><div class="num red" id="statWrongCount">0</div><div class="lbl">待复习错词</div></div>
+  </div>
+  <div class="stat-grid mt-12">
+    <div class="stat-card"><div class="num" id="statLevelDone">0/6</div><div class="lbl">已完成关卡</div></div>
+    <div class="stat-card"><div class="num" id="statStreak">0</div><div class="lbl">连续天数</div></div>
+  </div>
+  <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;">
+    <div style="font-size:13px;color:#667799;margin-bottom:8px;">总词汇量 <span id="statTotalWords">270</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;">
+        <div id="globalBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3f6ef0,#6c3ff0);border-radius:8px;transition:width 1s;"></div>
+      </div>
+      <span style="font-size:13px;color:#667799;white-space:nowrap;" id="globalPct">0%</span>
+    </div>
+  </div>
+  <div class="text-center mt-20">
+    <button class="btn-secondary" onclick="resetAllData()">⚠️ 重置所有数据</button>
+  </div>
+</div>
+
+<script>
+// ======================================================================
+// 词库（270词，6关，每关45词，带中文例句）
+// ======================================================================
+const LEVELS = [
+  { id:1, name:"第一关 · 基础", desc:"最核心的四级高频词" },
+  { id:2, name:"第二关 · 进阶", desc:"高频词的延伸和搭配" },
+  { id:3, name:"第三关 · 提升", desc:"中频词汇，阅读常见" },
+  { id:4, name:"第四关 · 强化", desc:"听力与写作常用词" },
+  { id:5, name:"第五关 · 冲刺", desc:"阅读理解高频词" },
+  { id:6, name:"第六关 · 精通", desc:"四级高阶词汇" }
+];
+
+// 词条：[word, phonetic, meaning, sentence_en, sentence_zh]
+const WORDS_RAW = [
+  // === 第一关 ===
+  ["abandon","/əˈbændən/","v. 放弃；遗弃","They had to abandon the project due to lack of funds.","由于缺乏资金，他们不得不放弃这个项目。"],
+  ["ability","/əˈbɪləti/","n. 能力；才能","She has the ability to solve complex problems quickly.","她有快速解决复杂问题的能力。"],
+  ["absorb","/əbˈzɔːb/","v. 吸收；吸引","Plants absorb carbon dioxide and release oxygen.","植物吸收二氧化碳并释放氧气。"],
+  ["abstract","/ˈæbstrækt/","adj. 抽象的 n. 摘要","The concept of freedom is quite abstract.","自由这个概念相当抽象。"],
+  ["academic","/ˌækəˈdemɪk/","adj. 学术的；学院的","He has a strong academic background in physics.","他有深厚的物理学学术背景。"],
+  ["accelerate","/əkˈseləreɪt/","v. 加速；促进","Economic growth accelerated in the second quarter.","经济增长在第二季度加速了。"],
+  ["access","/ˈækses/","n. 通道；接近 v. 访问","Students have free access to the library.","学生可以免费使用图书馆。"],
+  ["accompany","/əˈkʌmpəni/","v. 陪伴；伴随","His wife accompanied him on the business trip.","他的妻子陪同他出差。"],
+  ["accomplish","/əˈkʌmplɪʃ/","v. 完成；实现","We accomplished our goal ahead of schedule.","我们提前完成了目标。"],
+  ["accurate","/ˈækjərət/","adj. 准确的；精确的","Make sure your measurements are accurate.","确保你的测量数据准确。"],
+  ["accuse","/əˈkjuːz/","v. 指责；控告","He was accused of stealing company secrets.","他被指控窃取公司机密。"],
+  ["achieve","/əˈtʃiːv/","v. 达到；取得","She achieved her dream of becoming a doctor.","她实现了当医生的梦想。"],
+  ["acknowledge","/əkˈnɒlɪdʒ/","v. 承认；致谢","He acknowledged receiving the package.","他承认收到了包裹。"],
+  ["acquire","/əˈkwaɪə/","v. 获得；学到","She acquired a good knowledge of French.","她学到了扎实的法语知识。"],
+  ["adapt","/əˈdæpt/","v. 适应；改编","Animals must adapt to their environment to survive.","动物必须适应环境才能生存。"],
+  ["adequate","/ˈædɪkwət/","adj. 充足的；适当的","The food supply is adequate for the whole trip.","食物供应足够整趟旅行。"],
+  ["adjust","/əˈdʒʌst/","v. 调整；适应","You need to adjust the settings for better sound.","你需要调整设置以获得更好的音效。"],
+  ["adopt","/əˈdɒpt/","v. 采用；收养","They decided to adopt a new teaching method.","他们决定采用新的教学方法。"],
+  ["advance","/ədˈvɑːns/","v. 前进；促进 n. 进步","Technology has advanced rapidly in the past decade.","过去十年技术发展迅猛。"],
+  ["advantage","/ədˈvɑːntɪdʒ/","n. 优势；有利条件","Being bilingual is a great advantage in this job.","会双语是这份工作的一大优势。"],
+  ["advertise","/ˈædvətaɪz/","v. 做广告；宣传","Companies advertise their products on social media.","公司在社交媒体上宣传产品。"],
+  ["affair","/əˈfeə/","n. 事务；事件","The company managed its financial affairs well.","这家公司的财务管理得很好。"],
+  ["affect","/əˈfekt/","v. 影响；感动","The weather affects my mood significantly.","天气对我的情绪影响很大。"],
+  ["afford","/əˈfɔːd/","v. 负担得起；提供","I can't afford to waste any more time.","我浪费不起更多时间了。"],
+  ["aggressive","/əˈɡresɪv/","adj. 侵略的；好斗的","The aggressive dog barked fiercely at strangers.","那只凶猛的狗对着陌生人狂吠。"],
+  ["allocate","/ˈæləkeɪt/","v. 分配；拨出","The government allocated more funds for education.","政府拨出了更多教育经费。"],
+  ["alternative","/ɔːlˈtɜːnətɪv/","adj. 替代的 n. 选择","We need to find an alternative energy source.","我们需要找到替代能源。"],
+  ["analyze","/ˈænəlaɪz/","v. 分析；解析","Scientists analyzed the data from the experiment.","科学家分析了实验数据。"],
+  ["announce","/əˈnaʊns/","v. 宣布；通知","The principal announced the exam results.","校长宣布了考试结果。"],
+  ["annual","/ˈænjuəl/","adj. 每年的 n. 年刊","The company holds an annual meeting in December.","公司每年十二月召开年会。"],
+  ["anxiety","/æŋˈzaɪəti/","n. 焦虑；忧虑","Exam anxiety is common among college students.","考试焦虑在大学生中很常见。"],
+  ["apparent","/əˈpærənt/","adj. 明显的；表面的","It became apparent that he was lying.","很明显他在撒谎。"],
+  ["appeal","/əˈpiːl/","n./v. 呼吁；吸引；上诉","The idea of studying abroad appeals to me.","出国留学的想法很吸引我。"],
+  ["appetite","/ˈæpɪtaɪt/","n. 食欲；欲望","Regular exercise gives me a good appetite.","经常运动让我食欲很好。"],
+  ["application","/ˌæplɪˈkeɪʃn/","n. 申请；应用","I submitted my application for the scholarship.","我提交了奖学金申请。"],
+  ["appreciate","/əˈpriːʃieɪt/","v. 欣赏；感激","I really appreciate your timely help.","我真的很感激你及时的帮助。"],
+  ["approach","/əˈprəʊtʃ/","v. 接近 n. 方法","We need a fresh approach to this problem.","我们需要一个新方法来解决这个问题。"],
+  ["appropriate","/əˈprəʊpriət/","adj. 适当的","Choose the most appropriate word for each blank.","选择最恰当的单词填空。"],
+  ["approve","/əˈpruːv/","v. 批准；赞成","The committee approved the budget proposal.","委员会批准了预算提案。"],
+  ["arise","/əˈraɪz/","v. 出现；产生","A new opportunity arose unexpectedly.","一个意外的新机会出现了。"],
+  ["arrange","/əˈreɪndʒ/","v. 安排；整理","Let me arrange a meeting for next week.","让我安排下周的会议。"],
+  ["artificial","/ˌɑːtɪˈfɪʃl/","adj. 人工的；虚假的","This drink contains artificial sweeteners.","这种饮料含有人工甜味剂。"],
+  ["aspect","/ˈæspekt/","n. 方面；面貌","Every aspect of the project was carefully planned.","项目的每个方面都经过了精心规划。"],
+  ["assemble","/əˈsembl/","v. 集合；组装","The students assembled in the main hall.","学生们在大厅集合。"],
+  ["assess","/əˈses/","v. 评估；评定","Teachers assess students' performance regularly.","老师定期评估学生的表现。"],
+
+  // === 第二关 ===
+  ["assign","/əˈsaɪn/","v. 分配；指派","The teacher assigned homework for the weekend.","老师布置了周末作业。"],
+  ["assist","/əˈsɪst/","v. 帮助；协助","Can you assist me with this heavy box?","你能帮我搬这个重箱子吗？"],
+  ["associate","/əˈsəʊʃieɪt/","v. 联系；联想","I associate summer with beach holidays.","夏天让我联想到海滩度假。"],
+  ["assume","/əˈsjuːm/","v. 假定；承担","I assume you have read the instructions.","我假设你已经读过说明书了。"],
+  ["atmosphere","/ˈætməsfɪə/","n. 大气；氛围","The restaurant has a warm and cozy atmosphere.","这家餐厅氛围温暖舒适。"],
+  ["attach","/əˈtætʃ/","v. 附上；连接","Please attach your resume to the email.","请将简历附在邮件中。"],
+  ["attempt","/əˈtempt/","v./n. 尝试；企图","She made a brave attempt to climb the mountain.","她勇敢地尝试攀登那座山。"],
+  ["attend","/əˈtend/","v. 参加；出席","All employees must attend the safety training.","所有员工必须参加安全培训。"],
+  ["attitude","/ˈætɪtjuːd/","n. 态度；看法","A positive attitude leads to better results.","积极的态度带来更好的结果。"],
+  ["attract","/əˈtrækt/","v. 吸引；引起","The museum attracts thousands of visitors yearly.","这座博物馆每年吸引成千上万的游客。"],
+  ["authority","/ɔːˈθɒrəti/","n. 权威；当局","The local authorities closed the unsafe building.","当地政府关闭了那栋危楼。"],
+  ["available","/əˈveɪləbl/","adj. 可用的；有效的","Are there any seats available on this flight?","这趟航班还有空位吗？"],
+  ["average","/ˈævərɪdʒ/","adj. 平均的 n. 平均数","The average temperature here is 25 degrees.","这里的平均温度是25度。"],
+  ["avoid","/əˈvɔɪd/","v. 避免；回避","You should avoid eating too much processed food.","你应该避免吃太多加工食品。"],
+  ["aware","/əˈweə/","adj. 知道的；意识到的","Are you fully aware of the consequences?","你完全意识到后果了吗？"],
+  ["balance","/ˈbæləns/","n. 平衡 v. 使平衡","It's important to balance work and personal life.","平衡工作和个人生活很重要。"],
+  ["barrier","/ˈbæriə/","n. 障碍；屏障","Language can be a major barrier to communication.","语言可能是沟通的一大障碍。"],
+  ["behave","/bɪˈheɪv/","v. 表现；举止","Children should learn to behave properly.","孩子应该学会举止得当。"],
+  ["belief","/bɪˈliːf/","n. 相信；信念","It is my belief that honesty is the best policy.","我相信诚实是最好的策略。"],
+  ["benefit","/ˈbenɪfɪt/","n. 利益 v. 受益","Regular exercise has many health benefits.","经常运动对健康有很多好处。"],
+  ["blame","/bleɪm/","v. 责备 n. 责任","Don't blame others for your own mistakes.","不要把自己的错误归咎于别人。"],
+  ["bother","/ˈbɒðə/","v. 打扰；烦恼","Sorry to bother you, but I have a question.","抱歉打扰你，我有个问题。"],
+  ["boundary","/ˈbaʊndəri/","n. 边界；界限","The river forms the boundary between two countries.","这条河是两国的分界线。"],
+  ["brilliant","/ˈbrɪliənt/","adj. 灿烂的；杰出的","She came up with a brilliant idea.","她想出了一个绝妙的主意。"],
+  ["budget","/ˈbʌdʒɪt/","n. 预算 v. 做预算","We need to plan our monthly budget carefully.","我们需要仔细规划月度预算。"],
+  ["calculate","/ˈkælkjʊleɪt/","v. 计算；估计","Can you calculate the total cost for me?","你能帮我计算一下总费用吗？"],
+  ["campaign","/kæmˈpeɪn/","n. 运动；战役","They launched a campaign to protect the environment.","他们发起了一场环保运动。"],
+  ["capacity","/kəˈpæsəti/","n. 能力；容量","The hall has a seating capacity of 500.","这个大厅可容纳500人。"],
+  ["capture","/ˈkæptʃə/","v. 捕获；夺取","The photographer captured a beautiful sunset.","摄影师捕捉到了美丽的日落。"],
+  ["career","/kəˈrɪə/","n. 职业；生涯","She has a successful career in marketing.","她在市场营销领域有成功的职业生涯。"],
+  ["category","/ˈkætəɡəri/","n. 类别；范畴","The books are sorted by category in the library.","图书馆的书按类别分类。"],
+  ["celebrate","/ˈselɪbreɪt/","v. 庆祝；赞美","We celebrated her birthday with a surprise party.","我们办了个惊喜派对庆祝她的生日。"],
+  ["challenge","/ˈtʃælɪndʒ/","n. 挑战 v. 向…挑战","Learning a new language is a challenge.","学习一门新语言是个挑战。"],
+  ["character","/ˈkærəktə/","n. 性格；角色；字符","He is a man of strong and honest character.","他是个性格坚强诚实的人。"],
+  ["circumstance","/ˈsɜːkəmstæns/","n. 环境；情况","Under no circumstances should you give up.","在任何情况下你都不应该放弃。"],
+  ["claim","/kleɪm/","v. 声称；要求 n. 索赔","He claimed that he saw the accident.","他声称目击了事故。"],
+  ["clarify","/ˈklærəfaɪ/","v. 澄清；阐明","Could you clarify your point please?","你能阐明一下你的观点吗？"],
+  ["classify","/ˈklæsɪfaɪ/","v. 分类；归类","These documents are classified as top secret.","这些文件被归为绝密级别。"],
+  ["climate","/ˈklaɪmət/","n. 气候；风气","The climate in this region is very mild.","这个地区的气候非常温和。"],
+  ["collapse","/kəˈlæps/","v./n. 倒塌；崩溃","The old building collapsed during the earthquake.","那栋旧楼在地震中倒塌了。"],
+  ["command","/kəˈmɑːnd/","v. 命令；指挥 n. 指令","The general commanded his troops to advance.","将军命令部队前进。"],
+  ["comment","/ˈkɒment/","n./v. 评论；注释","He made a helpful comment on my essay.","他对我的文章做了有益的评论。"],
+  ["commit","/kəˈmɪt/","v. 犯(罪)；承诺","We are committed to providing quality service.","我们致力于提供优质服务。"],
+  ["communicate","/kəˈmjuːnɪkeɪt/","v. 交流；传播","We communicate with each other by email.","我们通过电子邮件互相交流。"],
+  ["community","/kəˈmjuːnəti/","n. 社区；团体","The local community supports the charity.","当地社区支持这个慈善机构。"],
+
+  // === 第三关 ===
+  ["companion","/kəmˈpæniən/","n. 同伴；伙伴","My dog is my loyal companion.","我的狗是我忠实的伙伴。"],
+  ["compare","/kəmˈpeə/","v. 比较；对比","Compare the two products before buying.","购买前比较一下这两个产品。"],
+  ["compete","/kəmˈpiːt/","v. 竞争；比赛","Many companies compete for market share.","许多公司争夺市场份额。"],
+  ["complain","/kəmˈpleɪn/","v. 抱怨；投诉","Customers complained about the poor service.","顾客投诉服务质量差。"],
+  ["complex","/ˈkɒmpleks/","adj. 复杂的 n. 综合体","The problem is more complex than it seems.","这个问题比看起来更复杂。"],
+  ["component","/kəmˈpəʊnənt/","n. 成分；组件","Each component of the machine is carefully tested.","机器的每个部件都经过仔细测试。"],
+  ["compose","/kəmˈpəʊz/","v. 组成；创作","Water is composed of hydrogen and oxygen.","水由氢和氧组成。"],
+  ["comprehensive","/ˌkɒmprɪˈhensɪv/","adj. 综合的；全面的","We offer a comprehensive training program.","我们提供全面的培训计划。"],
+  ["concentrate","/ˈkɒnsəntreɪt/","v. 集中；专注","I need to concentrate on my studies.","我需要集中精力学习。"],
+  ["concept","/ˈkɒnsept/","n. 概念；观念","The concept of time is difficult to define.","时间的概念很难定义。"],
+  ["concern","/kənˈsɜːn/","n. 关心 v. 涉及","Environmental issues are a major concern.","环境问题是一个主要关切。"],
+  ["conclude","/kənˈkluːd/","v. 结束；推断","What can you conclude from the data?","你能从这些数据中得出什么结论？"],
+  ["condition","/kənˈdɪʃn/","n. 条件；状况","The car is in excellent condition.","这辆车的状况非常好。"],
+  ["conduct","/kənˈdʌkt/","v. 引导；指挥 n. 行为","The scientist conducted a series of experiments.","科学家进行了一系列实验。"],
+  ["conference","/ˈkɒnfərəns/","n. 会议；讨论会","The conference will be held in Beijing.","会议将在北京举行。"],
+  ["confident","/ˈkɒnfɪdənt/","adj. 自信的；确信的","She is confident about passing the exam.","她自信能通过考试。"],
+  ["confirm","/kənˈfɜːm/","v. 确认；证实","Please confirm your reservation by email.","请通过邮件确认您的预订。"],
+  ["conflict","/ˈkɒnflɪkt/","n./v. 冲突；争执","The two reports conflict with each other.","这两份报告相互矛盾。"],
+  ["confuse","/kənˈfjuːz/","v. 使困惑；混淆","The instructions confused me completely.","这份说明完全把我搞糊涂了。"],
+  ["connect","/kəˈnekt/","v. 连接；联系","This path connects the two villages.","这条小路连接了两个村庄。"],
+  ["conscious","/ˈkɒnʃəs/","adj. 有意识的；自觉的","He was conscious of the danger.","他意识到了危险。"],
+  ["consequence","/ˈkɒnsɪkwəns/","n. 结果；后果","Think about the consequences before you act.","行动之前先考虑后果。"],
+  ["conservative","/kənˈsɜːvətɪv/","adj. 保守的 n. 保守派","She has a conservative view on education.","她对教育的看法比较保守。"],
+  ["considerable","/kənˈsɪdərəbl/","adj. 相当大的；重要的","There has been a considerable increase in sales.","销售额有了相当大的增长。"],
+  ["consist","/kənˈsɪst/","v. 由…组成；在于","The committee consists of twelve members.","委员会由十二名成员组成。"],
+  ["constant","/ˈkɒnstənt/","adj. 不变的；持续的","The machine runs at a constant speed.","机器以恒定速度运行。"],
+  ["construct","/kənˈstrʌkt/","v. 建造；建设","They plan to construct a new bridge.","他们计划建造一座新桥。"],
+  ["consume","/kənˈsjuːm/","v. 消费；消耗","Americans consume a lot of energy.","美国人消耗大量能源。"],
+  ["contact","/ˈkɒntækt/","n./v. 接触；联系","Please contact me if you have any questions.","如果有任何问题请与我联系。"],
+  ["contain","/kənˈteɪn/","v. 包含；容纳","This box contains all my books.","这个箱子装着我所有的书。"],
+  ["contemporary","/kənˈtempərəri/","adj. 当代的；同时代的","Contemporary art is not my cup of tea.","当代艺术不是我的菜。"],
+  ["content","/ˈkɒntent/","n. 内容；目录 adj. 满足的","The content of the report is very informative.","这份报告内容信息量很大。"],
+  ["contest","/ˈkɒntest/","n./v. 竞赛；争夺","She won first prize in the speech contest.","她在演讲比赛中获得了一等奖。"],
+  ["continue","/kənˈtɪnjuː/","v. 继续；延续","The rain continued for three days.","雨持续下了三天。"],
+  ["contract","/ˈkɒntrækt/","n. 合同 v. 收缩","We signed a contract with the supplier.","我们与供应商签了合同。"],
+  ["contribute","/kənˈtrɪbjuːt/","v. 贡献；捐献","Everyone should contribute to the community.","每个人都应该为社区做贡献。"],
+  ["controversy","/ˈkɒntrəvɜːsi/","n. 争论；争议","The decision caused a lot of controversy.","这个决定引发了很多争议。"],
+  ["convenient","/kənˈviːniənt/","adj. 方便的；便利的","The location is convenient for public transport.","这个位置公共交通便利。"],
+  ["convention","/kənˈvenʃn/","n. 惯例；大会","By convention, the meeting starts at 9 am.","按照惯例，会议上午9点开始。"],
+  ["convince","/kənˈvɪns/","v. 使确信；说服","I convinced him to change his mind.","我说服他改变了主意。"],
+  ["cooperate","/kəʊˈɒpəreɪt/","v. 合作；配合","The two companies agreed to cooperate.","两家公司同意合作。"],
+  ["correspond","/ˌkɒrəˈspɒnd/","v. 对应；通信","The numbers correspond to codes on the map.","这些数字对应地图上的代码。"],
+  ["creative","/kriˈeɪtɪv/","adj. 创造性的","She has a very creative approach to design.","她有非常有创意的设计方法。"],
+  ["critical","/ˈkrɪtɪkl/","adj. 批评的；关键的","It is critical that we finish on time.","我们按时完成至关重要。"],
+  ["cultivate","/ˈkʌltɪveɪt/","v. 培养；耕作","You should cultivate good study habits.","你应该培养良好的学习习惯。"],
+
+  // === 第四关 ===
+  ["curious","/ˈkjʊəriəs/","adj. 好奇的；稀奇的","Children are naturally curious about everything.","孩子天生对一切都好奇。"],
+  ["current","/ˈkʌrənt/","adj. 当前的 n. 水流","What is the current situation?","目前的情况如何？"],
+  ["debate","/dɪˈbeɪt/","n./v. 辩论；讨论","There is a heated debate about climate change.","关于气候变化有一场激烈的辩论。"],
+  ["decade","/ˈdekeɪd/","n. 十年；十年期","Technology has changed dramatically over the past decade.","过去十年技术发生了翻天覆地的变化。"],
+  ["decline","/dɪˈklaɪn/","v./n. 下降；衰退","The population of the village has declined.","这个村庄的人口减少了。"],
+  ["decorate","/ˈdekəreɪt/","v. 装饰；装修","They decorated the room for the party.","他们为派对装饰了房间。"],
+  ["decrease","/dɪˈkriːs/","v./n. 减少；减小","The number of students has decreased.","学生人数减少了。"],
+  ["defeat","/dɪˈfiːt/","v./n. 战胜；击败","The team defeated their opponents easily.","这支队伍轻松击败了对手。"],
+  ["defend","/dɪˈfend/","v. 防御；辩护","It is our duty to defend our country.","保卫国家是我们的职责。"],
+  ["define","/dɪˈfaɪn/","v. 定义；界定","How would you define success?","你如何定义成功？"],
+  ["deliberate","/dɪˈlɪbərət/","adj. 故意的 v. 仔细考虑","It was a deliberate attempt to mislead us.","这是故意误导我们的企图。"],
+  ["deliver","/dɪˈlɪvə/","v. 递送；发表；接生","The package was delivered on time.","包裹按时送达了。"],
+  ["demand","/dɪˈmɑːnd/","n./v. 要求；需求","There is a high demand for skilled workers.","对技术工人的需求很大。"],
+  ["demonstrate","/ˈdemənstreɪt/","v. 证明；示范","The experiment demonstrates the principle clearly.","这个实验清楚地展示了这个原理。"],
+  ["depart","/dɪˈpɑːt/","v. 离开；出发","The train departs at 6 pm.","火车下午6点出发。"],
+  ["depend","/dɪˈpend/","v. 依赖；取决于","Success depends on your effort and attitude.","成功取决于你的努力和态度。"],
+  ["deposit","/dɪˈpɒzɪt/","v. 存放 n. 押金","You need to pay a deposit to reserve the room.","你需要付押金来预订房间。"],
+  ["describe","/dɪˈskraɪb/","v. 描述；形容","Can you describe what you saw?","你能描述一下你看到的吗？"],
+  ["deserve","/dɪˈzɜːv/","v. 应得；值得","You deserve a break after all that hard work.","辛苦工作之后你该休息一下。"],
+  ["desire","/dɪˈzaɪə/","n./v. 渴望；欲望","She has a strong desire to learn.","她有强烈的学习欲望。"],
+  ["desperate","/ˈdespərət/","adj. 绝望的；拼命的","He was desperate for a job.","他拼命想要一份工作。"],
+  ["destroy","/dɪˈstrɔɪ/","v. 破坏；摧毁","The earthquake destroyed many buildings.","地震摧毁了许多建筑物。"],
+  ["determine","/dɪˈtɜːmɪn/","v. 决定；确定","Your attitude determines your success.","你的态度决定你的成功。"],
+  ["develop","/dɪˈveləp/","v. 发展；开发；发育","The company develops new software products.","这家公司开发新的软件产品。"],
+  ["device","/dɪˈvaɪs/","n. 设备；装置","This device can charge your phone wirelessly.","这个设备可以给你的手机无线充电。"],
+  ["devote","/dɪˈvəʊt/","v. 奉献；致力于","She devoted her life to education.","她将一生奉献给了教育事业。"],
+  ["discipline","/ˈdɪsəplɪn/","n. 纪律；学科","Self-discipline is the key to success.","自律是成功的关键。"],
+  ["discover","/dɪˈskʌvə/","v. 发现；发觉","Scientists discovered a new species of frog.","科学家发现了一种新的青蛙物种。"],
+  ["display","/dɪˈspleɪ/","v./n. 展示；陈列","The museum displays ancient artifacts.","博物馆展示古代文物。"],
+  ["distinguish","/dɪˈstɪŋɡwɪʃ/","v. 区分；辨别","Can you distinguish between the two sounds?","你能区分这两种声音吗？"],
+  ["distribute","/dɪˈstrɪbjuːt/","v. 分配；分发","The charity distributes food to the poor.","慈善机构向穷人分发食物。"],
+  ["domestic","/dəˈmestɪk/","adj. 国内的；家庭的","The domestic economy is growing steadily.","国内经济正在稳步增长。"],
+  ["dominate","/ˈdɒmɪneɪt/","v. 支配；主宰","The company dominates the global market.","这家公司主导着全球市场。"],
+  ["dramatic","/drəˈmætɪk/","adj. 戏剧性的；巨大的","There has been a dramatic increase in sales.","销售额有了巨大的增长。"],
+  ["eager","/ˈiːɡə/","adj. 渴望的；热切的","The children were eager to open their presents.","孩子们急切地想打开礼物。"],
+  ["economy","/ɪˈkɒnəmi/","n. 经济；节约","The economy is showing signs of recovery.","经济正在显示出复苏的迹象。"],
+  ["educate","/ˈedʒukeɪt/","v. 教育；培养","Parents should educate their children about safety.","父母应该教育孩子注意安全。"],
+  ["efficient","/ɪˈfɪʃnt/","adj. 高效的；有效率的","This new system is much more efficient.","这个新系统高效得多。"],
+  ["eliminate","/ɪˈlɪmɪneɪt/","v. 消除；淘汰","We need to eliminate unnecessary expenses.","我们需要消除不必要的开支。"],
+  ["embrace","/ɪmˈbreɪs/","v. 拥抱；包含","She embraced her child warmly.","她热情地拥抱了她的孩子。"],
+  ["emotion","/ɪˈməʊʃn/","n. 情感；情绪","She could not control her emotions.","她无法控制自己的情绪。"],
+  ["emphasis","/ˈemfəsɪs/","n. 强调；重点","The school puts great emphasis on sports.","学校非常重视体育。"],
+  ["employ","/ɪmˈplɔɪ/","v. 雇用；使用","The factory employs over 500 workers.","这家工厂雇佣了500多名工人。"],
+  ["enable","/ɪˈneɪbl/","v. 使能够；启用","The scholarship enabled her to go to college.","奖学金使她能够上大学。"],
+  ["encounter","/ɪnˈkaʊntə/","v./n. 遭遇；邂逅","I encountered many difficulties along the way.","我一路遇到了许多困难。"],
+
+  // === 第五关 ===
+  ["encourage","/ɪnˈkʌrɪdʒ/","v. 鼓励；促进","Teachers should encourage students to ask questions.","老师应该鼓励学生提问。"],
+  ["engage","/ɪnˈɡeɪdʒ/","v. 从事；吸引","She engaged in a lively conversation.","她参与了一场热烈的谈话。"],
+  ["enormous","/ɪˈnɔːməs/","adj. 巨大的；庞大的","The project requires an enormous amount of money.","这个项目需要巨额资金。"],
+  ["ensure","/ɪnˈʃʊə/","v. 确保；保证","Please ensure that all doors are locked.","请确保所有门都锁好了。"],
+  ["enterprise","/ˈentəpraɪz/","n. 企业；事业","Small enterprises play a vital role in the economy.","小企业在经济中扮演着重要角色。"],
+  ["entertain","/ˌentəˈteɪn/","v. 娱乐；款待","The clown entertained the children at the party.","小丑在派对上逗孩子们开心。"],
+  ["enthusiasm","/ɪnˈθjuːziæzəm/","n. 热情；热忱","She shows great enthusiasm for her work.","她对工作表现出极大的热情。"],
+  ["environment","/ɪnˈvaɪrənmənt/","n. 环境；周围","We must protect the environment for future generations.","我们必须为后代保护环境。"],
+  ["equipment","/ɪˈkwɪpmənt/","n. 设备；装备","The gym has state-of-the-art equipment.","健身房有一流的设备。"],
+  ["essential","/ɪˈsenʃl/","adj. 必要的；本质的","Water is essential for all living things.","水对所有生物都是必不可少的。"],
+  ["establish","/ɪˈstæblɪʃ/","v. 建立；确立","The company was established in 1990.","这家公司成立于1990年。"],
+  ["evaluate","/ɪˈvæljueɪt/","v. 评估；评价","We need to evaluate the effectiveness of the program.","我们需要评估这个项目的效果。"],
+  ["evident","/ˈevɪdənt/","adj. 明显的；明白的","It is evident that he is not telling the truth.","很明显他没有说实话。"],
+  ["evolve","/ɪˈvɒlv/","v. 进化；发展","Species evolve over time to adapt to their environment.","物种随着时间进化以适应环境。"],
+  ["examine","/ɪɡˈzæmɪn/","v. 检查；审视","The doctor examined the patient carefully.","医生仔细检查了病人。"],
+  ["exception","/ɪkˈsepʃn/","n. 例外；除外","Everyone must follow the rules without exception.","每个人都必须遵守规则，无一例外。"],
+  ["exchange","/ɪksˈtʃeɪndʒ/","v./n. 交换；兑换","We exchanged ideas during the meeting.","我们在会议期间交流了想法。"],
+  ["exclude","/ɪkˈskluːd/","v. 排除；排斥","The price excludes delivery charges.","这个价格不含运费。"],
+  ["executive","/ɪɡˈzekjətɪv/","adj. 执行的 n. 高管","She works as a senior executive in a bank.","她在一家银行担任高级主管。"],
+  ["exercise","/ˈeksəsaɪz/","n./v. 锻炼；练习","Regular exercise improves your health.","定期锻炼能改善你的健康。"],
+  ["exhibit","/ɪɡˈzɪbɪt/","v. 展览；展示 n. 展品","The artist will exhibit his paintings at the gallery.","这位艺术家将在画廊展出他的画作。"],
+  ["exist","/ɪɡˈzɪst/","v. 存在；生存","Life cannot exist without water.","没有水生命就无法存在。"],
+  ["expand","/ɪkˈspænd/","v. 扩展；膨胀","The company plans to expand into Asian markets.","公司计划扩展到亚洲市场。"],
+  ["expect","/ɪkˈspekt/","v. 期望；预期","I expect to finish the project by Friday.","我预计周五前完成这个项目。"],
+  ["expense","/ɪkˈspens/","n. 花费；代价","The expense of living in the city is very high.","城市生活费用很高。"],
+  ["experiment","/ɪkˈsperɪmənt/","n./v. 实验；试验","We conducted an experiment to test the theory.","我们做了一个实验来验证这个理论。"],
+  ["expert","/ˈekspɜːt/","n. 专家 adj. 熟练的","She is an expert in environmental science.","她是环境科学方面的专家。"],
+  ["explain","/ɪkˈspleɪn/","v. 解释；说明","Can you explain this term in simple words?","你能用简单的话解释这个术语吗？"],
+  ["explore","/ɪkˈsplɔː/","v. 探索；考察","We explored the old town on foot.","我们步行探索了古城。"],
+  ["export","/ɪkˈspɔːt/","v./n. 出口；输出","China exports a lot of electronic goods.","中国出口大量电子产品。"],
+  ["expose","/ɪkˈspəʊz/","v. 暴露；揭露","Don't expose your skin to the sun for too long.","不要让皮肤暴晒太久。"],
+  ["extend","/ɪkˈstend/","v. 延伸；延长","We decided to extend our stay by two days.","我们决定将停留时间延长两天。"],
+  ["external","/ɪkˈstɜːnl/","adj. 外部的；外面的","The external walls of the house need painting.","房子的外墙需要粉刷。"],
+  ["extraordinary","/ɪkˈstrɔːdnri/","adj. 非凡的；特别的","She has an extraordinary talent for music.","她有着非凡的音乐天赋。"],
+  ["extreme","/ɪkˈstriːm/","adj. 极端的 n. 极端","The weather can be extreme in this region.","这个地区的天气可能很极端。"],
+  ["facility","/fəˈsɪləti/","n. 设施；设备","The hotel has excellent sports facilities.","这家酒店有极好的运动设施。"],
+  ["factor","/ˈfæktə/","n. 因素；要素","Cost is an important factor in our decision.","成本是我们决策的重要因素。"],
+  ["familiar","/fəˈmɪliə/","adj. 熟悉的；常见的","I am not familiar with this software.","我不熟悉这个软件。"],
+  ["fascinating","/ˈfæsɪneɪtɪŋ/","adj. 迷人的；极好的","The documentary about space was fascinating.","这部关于太空的纪录片引人入胜。"],
+  ["feature","/ˈfiːtʃə/","n. 特征；特点 v. 以…为特色","The phone has many advanced features.","这款手机有很多先进功能。"],
+  ["finance","/ˈfaɪnæns/","n. 财务；金融 v. 资助","He works in the finance department.","他在财务部工作。"],
+  ["flexible","/ˈfleksəbl/","adj. 灵活的；易弯曲的","We need a more flexible approach to scheduling.","我们需要更灵活的排程方法。"],
+  ["forecast","/ˈfɔːkɑːst/","n./v. 预测；预报","The weather forecast says it will rain tomorrow.","天气预报说明天会下雨。"],
+  ["foundation","/faʊnˈdeɪʃn/","n. 基础；基金会","A good education provides a solid foundation.","良好的教育打下坚实的基础。"],
+  ["frequent","/ˈfriːkwənt/","adj. 频繁的；经常的","There are frequent flights to Hong Kong.","飞往香港的航班很频繁。"],
+
+  // === 第六关 ===
+  ["frustrate","/frʌˈstreɪt/","v. 使沮丧；挫败","The lack of progress frustrated everyone.","缺乏进展让每个人都感到沮丧。"],
+  ["function","/ˈfʌŋkʃn/","n. 功能；作用 v. 运行","The machine is functioning properly now.","机器现在运行正常。"],
+  ["fundamental","/ˌfʌndəˈmentl/","adj. 基本的；根本的","There is a fundamental difference between the two.","两者之间有根本性的区别。"],
+  ["generate","/ˈdʒenəreɪt/","v. 产生；生成","The wind turbines generate electricity.","风力涡轮机发电。"],
+  ["generous","/ˈdʒenərəs/","adj. 慷慨的；大方的","He made a generous donation to the charity.","他向慈善机构慷慨捐款。"],
+  ["genuine","/ˈdʒenjuɪn/","adj. 真正的；真诚的","She showed genuine concern for her friends.","她对朋友表现出真诚的关心。"],
+  ["global","/ˈɡləʊbl/","adj. 全球的；全面的","Climate change is a global issue.","气候变化是全球性问题。"],
+  ["gradual","/ˈɡrædʒuəl/","adj. 逐渐的；渐进的","There has been a gradual improvement in the weather.","天气逐渐好转。"],
+  ["guarantee","/ˌɡærənˈtiː/","v./n. 保证；担保","The product comes with a two-year guarantee.","这个产品提供两年质保。"],
+  ["harmony","/ˈhɑːməni/","n. 和谐；融洽","They live in harmony with nature.","他们与自然和谐相处。"],
+  ["hesitate","/ˈhezɪteɪt/","v. 犹豫；踌躇","Don't hesitate to ask if you need help.","如果需要帮助，不要犹豫。"],
+  ["highlight","/ˈhaɪlaɪt/","v. 强调；突出 n. 亮点","The report highlights the need for reform.","报告强调了改革的必要性。"],
+  ["horizon","/həˈraɪzn/","n. 地平线；眼界","Traveling broadens your horizons.","旅行能开阔你的眼界。"],
+  ["identity","/aɪˈdentəti/","n. 身份；特性","He kept his identity secret.","他对自己的身份保密。"],
+  ["ignore","/ɪɡˈnɔː/","v. 忽视；不理会","You cannot ignore the facts.","你不能忽视事实。"],
+  ["illustrate","/ˈɪləstreɪt/","v. 说明；举例","Let me illustrate my point with an example.","让我举个例子来说明我的观点。"],
+  ["imagination","/ɪˌmædʒɪˈneɪʃn/","n. 想象力；创造力","Children have very vivid imaginations.","孩子有非常生动的想象力。"],
+  ["immediate","/ɪˈmiːdiət/","adj. 立即的；直接的","We need immediate action to solve the problem.","我们需要立即采取行动来解决问题。"],
+  ["impact","/ˈɪmpækt/","n./v. 影响；冲击","The new policy had a significant impact.","新政策产生了重大影响。"],
+  ["implement","/ˈɪmplɪment/","v. 实施；执行","The company plans to implement the new system.","公司计划实施新系统。"],
+  ["imply","/ɪmˈplaɪ/","v. 暗示；意味着","What are you trying to imply?","你想暗示什么？"],
+  ["impose","/ɪmˈpəʊz/","v. 强加；征收","The government imposed new taxes on imports.","政府对进口商品征收了新税。"],
+  ["impress","/ɪmˈpres/","v. 给…留下印象","She impressed everyone with her presentation.","她的演讲给所有人留下了深刻印象。"],
+  ["income","/ˈɪnkʌm/","n. 收入；收益","His monthly income is about 8,000 yuan.","他的月收入大约8000元。"],
+  ["independent","/ˌɪndɪˈpendənt/","adj. 独立的；自主的","She is very independent for her age.","就她的年龄而言，她非常独立。"],
+  ["indicate","/ˈɪndɪkeɪt/","v. 表明；指示","The results indicate that the treatment works.","结果表明这种治疗有效。"],
+  ["individual","/ˌɪndɪˈvɪdʒuəl/","adj. 个人的 n. 个人","Each individual has their own unique talent.","每个人都有自己独特的才能。"],
+  ["influence","/ˈɪnfluəns/","n./v. 影响；势力","Social media has a huge influence on young people.","社交媒体对年轻人有巨大影响。"],
+  ["inform","/ɪnˈfɔːm/","v. 通知；告知","Please inform us of any changes.","如有任何变动请通知我们。"],
+  ["ingredient","/ɪnˈɡriːdiənt/","n. 成分；原料","Fresh ingredients are the key to good cooking.","新鲜的食材是美味烹饪的关键。"],
+  ["initiative","/ɪˈnɪʃətɪv/","n. 主动性；倡议","She took the initiative to organize the event.","她主动组织了这个活动。"],
+  ["innocent","/ˈɪnəsnt/","adj. 无辜的；天真的","He was found innocent of the crime.","他被判无罪。"],
+  ["inspire","/ɪnˈspaɪə/","v. 激励；赋予灵感","The teacher inspired her students to aim high.","老师激励学生志存高远。"],
+  ["institute","/ˈɪnstɪtjuːt/","n. 学院；研究所","She works at a research institute.","她在一家研究所工作。"],
+  ["intellectual","/ˌɪntəˈlektʃuəl/","adj. 智力的 n. 知识分子","Reading is a good intellectual exercise.","阅读是很好的智力锻炼。"],
+  ["intelligent","/ɪnˈtelɪdʒənt/","adj. 聪明的；智慧的","Dolphins are highly intelligent animals.","海豚是非常聪明的动物。"],
+  ["intense","/ɪnˈtens/","adj. 强烈的；紧张的","The intense heat made it difficult to work.","酷热使得工作很困难。"],
+  ["interfere","/ˌɪntəˈfɪə/","v. 干涉；妨碍","Don't interfere in other people's business.","不要干涉别人的事情。"],
+  ["interpret","/ɪnˈtɜːprɪt/","v. 解释；口译","How do you interpret this poem?","你怎么解读这首诗？"],
+  ["investigate","/ɪnˈvestɪɡeɪt/","v. 调查；研究","The police are investigating the case.","警方正在调查这个案件。"],
+  ["involve","/ɪnˈvɒlv/","v. 涉及；包含","The project involves a lot of teamwork.","这个项目需要大量的团队合作。"],
+  ["isolate","/ˈaɪsəleɪt/","v. 隔离；孤立","The patient was isolated to prevent infection.","病人被隔离以防止感染。"],
+  ["issue","/ˈɪʃuː/","n. 问题；议题 v. 发行","Environmental issues are widely discussed today.","环境问题是当今广泛讨论的话题。"],
+  ["journal","/ˈdʒɜːnl/","n. 日记；期刊","She keeps a daily journal of her travels.","她每天写旅行日记。"],
+  ["judgment","/ˈdʒʌdʒmənt/","n. 判断；判决","Trust your own judgment in this matter.","在这件事上相信你自己的判断。"]
+];
+
+// 构建 WORD_DATA 对象数组
+const WORD_DATA = WORDS_RAW.map(w => ({
+  word: w[0], p: w[1], m: w[2], s: w[3], t: w[4]
+}));
+
+// ======================================================================
+// 状态
+// ======================================================================
+function getDefaultData() {
+  return {
+    completedLevels: [],
+    levelProgress: {},
+    wrongWords: {},
+    dailyDate: "",
+    dailyCount: 0,
+    dailyCorrect: 0,
+    dailyGoal: 10,
+    streak: 0,
+    dailyReset: true,
+    totalLearned: 0,
+    totalCorrect: 0,
+    totalWrong: 0
+  };
+}
+
+let D = getDefaultData();
+let studyMode = 'browse'; // browse | spell | quiz
+let currentLevelId = 1;
+let currentWords = [];
+let studyWords = [];
+let currentIdx = 0;
+let spellResults = [];
+let practiceMode = false;
+
+// ======================================================================
+// 数据持久化
+// ======================================================================
+function loadData() {
+  try {
+    const raw = localStorage.getItem('cet4_data_v2');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const def = getDefaultData();
+      for (const k of Object.keys(def)) {
+        if (parsed[k] === undefined) parsed[k] = def[k];
+      }
+      D = parsed;
+    }
+  } catch(e) { D = getDefaultData(); }
+  checkDailyReset();
+}
+
+function saveData() { localStorage.setItem('cet4_data_v2', JSON.stringify(D)); }
+
+function getTodayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function checkDailyReset() {
+  const today = getTodayStr();
+  if (D.dailyDate !== today) {
+    if (D.dailyReset) { D.dailyCount = 0; D.dailyCorrect = 0; }
+    D.dailyDate = today;
+    // streak
+    const lastActive = localStorage.getItem('cet4_last_active') || '';
+    if (lastActive !== today) {
+      const y = new Date(); y.setDate(y.getDate()-1);
+      const yStr = `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+      if (lastActive === yStr) D.streak++;
+      else if (lastActive !== '') D.streak = 0;
+      localStorage.setItem('cet4_last_active', today);
+    }
+    saveData();
+  }
+}
+
+// ======================================================================
+// 页面导航
+// ======================================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.nav a').forEach(a => {
+    if (a.textContent.includes(name==='wrongBook'?'错词':name==='levels'?'关':name==='stats'?'统计':'首')) a.classList.add('active');
+  });
+  if (name==='home') refreshHome();
+  if (name==='levels') renderLevels();
+  if (name==='wrongBook') renderWrongBook();
+  if (name==='stats') refreshStats();
+}
+
+// ======================================================================
+// 首页
+// ======================================================================
+function refreshHome() {
+  document.getElementById('homeTodayCount').textContent = D.dailyCount;
+  document.getElementById('homeGoalDisplay').textContent = D.dailyGoal;
+  document.getElementById('dailyGoalInput').value = D.dailyGoal;
+  document.getElementById('streakNum').textContent = D.streak || 0;
+  // ring
+  const pct = D.dailyGoal > 0 ? Math.min(Math.round(D.dailyCount / D.dailyGoal * 100), 100) : 0;
+  document.getElementById('homeRing').style.setProperty('--pct', pct + '%');
+  document.getElementById('homePct').textContent = pct + '%';
+  document.getElementById('homeTodaySub').textContent = `今日已学 · 目标 ${D.dailyGoal} 词 · 正确 ${D.dailyCorrect}/${D.dailyCount}`;
+  // presets
+  document.querySelectorAll('.goal-presets button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.textContent) === D.dailyGoal);
+  });
+}
+
+function setDailyGoal(n) {
+  D.dailyGoal = n;
+  document.getElementById('dailyGoalInput').value = n;
+  saveData();
+  refreshHome();
+}
+document.getElementById('dailyGoalInput').addEventListener('change', function() {
+  const v = parseInt(this.value) || 10;
+  setDailyGoal(Math.max(1, Math.min(100, v)));
+});
+
+// 学习模式
+function setMode(m) {
+  studyMode = m;
+  document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mode-selector button').forEach(b => {
+    if (b.textContent.includes(m==='browse'?'浏览':m==='spell'?'拼写':'选择')) b.classList.add('active');
+  });
+}
+
+function continueStudy() {
+  // check daily goal
+  if (D.dailyCount >= D.dailyGoal) {
+    if (!confirm('今日目标已完成！确定要继续学吗？')) return;
+  }
+  // find first incomplete available level
+  for (const lv of LEVELS) {
+    const words = getLevelWords(lv.id);
+    const prog = D.levelProgress[lv.id] || { done: [] };
+    if (prog.done.length < words.length) {
+      if (lv.id === 1 || D.completedLevels.includes(lv.id - 1)) {
+        // Prioritize wrong words if any
+        const wrongKeys = Object.keys(D.wrongWords);
+        if (wrongKeys.length > 0 && lv.id === 1) {
+          if (confirm('错词本中有 ${wrongKeys.length} 个待复习单词，先复习错词？')) {
+            practiceWrong();
+            return;
+          }
+        }
+        startLevel(lv.id);
+        return;
+      }
+    }
+  }
+  // all done
+  alert('🎉 所有关卡已完成！去错词本复习吧。');
+  showPage('levels');
+}
+
+// ======================================================================
+// 关卡
+// ======================================================================
+function getLevelWords(levelId) {
+  const idx = (levelId - 1) * 45;
+  return WORD_DATA.slice(idx, idx + 45);
+}
+
+function renderLevels() {
+  const el = document.getElementById('levelList'); el.innerHTML = '';
+  for (const lv of LEVELS) {
+    const words = getLevelWords(lv.id);
+    const prog = D.levelProgress[lv.id] || { done: [] };
+    const pct = words.length > 0 ? Math.round(prog.done.length / words.length * 100) : 0;
+    const unlocked = lv.id === 1 || D.completedLevels.includes(lv.id - 1);
+    const completed = D.completedLevels.includes(lv.id);
+    const div = document.createElement('div');
+    div.className = 'level-item' + (!unlocked ? ' locked' : '');
+    if (unlocked) div.onclick = () => startLevel(lv.id);
+    const icon = completed ? '✅' : (unlocked ? String(lv.id) : '🔒');
+    const st = completed ? '已完成' : (unlocked ? `${prog.done.length}/${words.length}` : '未解锁');
+    div.innerHTML = `<div class="level-icon">${icon}</div><div class="level-info"><div class="name">${lv.name}</div><div class="desc">${lv.desc}</div><div class="bar-wrap"><div class="bar-fill" style="width:${completed?100:pct}%"></div></div></div><div class="level-status">${st}</div>`;
+    el.appendChild(div);
+  }
+}
+
+// ======================================================================
+// 学习
+// ======================================================================
+function startLevel(levelId) {
+  currentLevelId = levelId;
+  currentWords = getLevelWords(levelId);
+  // shuffle
+  for (let i = currentWords.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [currentWords[i], currentWords[j]] = [currentWords[j], currentWords[i]];
+  }
+  studyWords = currentWords;
+  currentIdx = 0;
+  spellResults = [];
+  practiceMode = false;
+
+  showPage('study');
+  // set active tab
+  document.querySelectorAll('.study-mode-tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tabBrowse').classList.add('active');
+  showBrowsePhase();
+}
+
+function switchStudyMode(mode) {
+  document.querySelectorAll('.study-mode-tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+  if (mode === 'browse') { showBrowsePhase(); return; }
+  if (mode === 'spell') { showSpellPhase(); return; }
+  if (mode === 'quiz') { showQuizPhase(); return; }
+}
+
+// ===== 浏览模式 =====
+function showBrowsePhase() {
+  if (currentIdx >= studyWords.length) currentIdx = 0;
+  document.getElementById('browseArea').style.display = 'block';
+  document.getElementById('spellArea').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('levelDone').style.display = 'none';
+  renderBrowseWord();
+}
+
+function renderBrowseWord() {
+  const w = studyWords[currentIdx];
+  document.getElementById('bWord').textContent = w.word;
+  document.getElementById('bPhonetic').textContent = w.p;
+  document.getElementById('bMeaning').textContent = w.m;
+  document.getElementById('bSentence').textContent = w.s;
+  document.getElementById('bSentenceZh').textContent = w.t;
+  document.getElementById('browseCount').textContent = `${currentIdx+1} / ${studyWords.length}`;
+  document.getElementById('studyProgress').innerHTML = `📖 浏览 · 第 <strong>${currentIdx+1}</strong> / <strong>${studyWords.length}</strong>`;
+  setTimeout(() => speakBrowseWord(), 200);
+}
+
+function speakBrowseWord() {
+  if ('speechSynthesis' in window) {
+    const w = studyWords[currentIdx];
+    const utter = new SpeechSynthesisUtterance(w.word);
+    utter.lang = 'en-GB'; utter.rate = 0.85;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+}
+
+function browseNext() { if (currentIdx < studyWords.length - 1) { currentIdx++; renderBrowseWord(); } }
+function browsePrev() { if (currentIdx > 0) { currentIdx--; renderBrowseWord(); } }
+
+// ===== 拼写模式 =====
+function showSpellPhase() {
+  document.getElementById('browseArea').style.display = 'none';
+  document.getElementById('spellArea').style.display = 'block';
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('levelDone').style.display = 'none';
+  if (currentIdx >= studyWords.length) { showLevelDone(); return; }
+  const w = studyWords[currentIdx];
+  document.getElementById('sMeaning').textContent = w.m;
+  document.getElementById('sPhonetic').textContent = w.p;
+  document.getElementById('sSentence').textContent = w.s;
+  document.getElementById('sCharHint').textContent = `共 ${w.word.length} 个字母`;
+  document.getElementById('studyProgress').innerHTML = `✍️ 拼写 · 第 <strong>${currentIdx+1}</strong> / <strong>${studyWords.length}</strong>`;
+  const input = document.getElementById('spellInput');
+  input.value = ''; input.className = ''; input.disabled = false; input.focus();
+  document.getElementById('spellFeedback').textContent = '';
+  document.getElementById('spellFeedback').className = 'spell-feedback';
+  document.getElementById('btnReveal').style.display = 'none';
+  document.getElementById('btnNextSpell').style.display = 'none';
+}
+
+function checkSpell() {
+  const input = document.getElementById('spellInput');
+  const fb = document.getElementById('spellFeedback');
+  if (!input.value.trim()) { fb.textContent = '请输入单词'; fb.className = 'spell-feedback wrong'; return; }
+  const w = studyWords[currentIdx];
+  const ok = input.value.toLowerCase().trim() === w.word.toLowerCase().trim();
+  input.disabled = true;
+  spellResults.push({ word: w.word, correct: ok });
+  if (ok) {
+    input.className = 'correct';
+    fb.textContent = '✅ 拼写正确！'; fb.className = 'spell-feedback correct';
+    D.dailyCorrect++; D.totalCorrect++;
+  } else {
+    input.className = 'wrong';
+    fb.innerHTML = `❌ 正确写法：<span class="right-ans">${w.word}</span>`; fb.className = 'spell-feedback wrong';
+    if (!D.wrongWords[w.word]) D.wrongWords[w.word] = { word: w.word, meaning: w.m, count: 0, sentence: w.s };
+    D.wrongWords[w.word].count++;
+    D.totalWrong++;
+  }
+  D.dailyCount++; D.totalLearned++;
+  document.getElementById('btnReveal').style.display = ok ? 'none' : 'inline-block';
+  document.getElementById('btnNextSpell').style.display = 'inline-block';
+  saveData();
+}
+
+function revealWord() {
+  const w = studyWords[currentIdx];
+  document.getElementById('spellFeedback').innerHTML = `👀 正确答案：<span class="right-ans">${w.word}</span>`;
+  document.getElementById('spellInput').value = w.word; document.getElementById('spellInput').className = '';
+  document.getElementById('btnReveal').style.display = 'none';
+}
+
+function nextStudyWord() {
+  currentIdx++;
+  if (currentIdx >= studyWords.length) { showLevelDone(); return; }
+  showSpellPhase();
+}
+
+// ===== 选择题模式 =====
+function showQuizPhase() {
+  document.getElementById('browseArea').style.display = 'none';
+  document.getElementById('spellArea').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('levelDone').style.display = 'none';
+  if (currentIdx >= studyWords.length) { showLevelDone(); return; }
+  const w = studyWords[currentIdx];
+  document.getElementById('qMeaning').textContent = w.m;
+  document.getElementById('qSentence').textContent = w.s;
+  document.getElementById('studyProgress').innerHTML = `🎯 选择 · 第 <strong>${currentIdx+1}</strong> / <strong>${studyWords.length}</strong>`;
+  document.getElementById('btnNextQuiz').style.display = 'none';
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  generateQuizOptions(w);
+}
+
+function generateQuizOptions(correctWord) {
+  const el = document.getElementById('quizOptions'); el.innerHTML = '';
+  // pick 3 random wrong words from the same level
+  let pool = studyWords.filter(w => w.word !== correctWord.word);
+  // shuffle pool
+  for (let i = pool.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const wrongOptions = pool.slice(0, 3);
+  const options = [correctWord, ...wrongOptions];
+  // shuffle options
+  for (let i = options.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  let answered = false;
+  options.forEach(o => {
+    const btn = document.createElement('button');
+    btn.textContent = o.word;
+    btn.onclick = () => {
+      if (answered) return;
+      answered = true;
+      const isCorrect = o.word === correctWord.word;
+      // highlight all
+      document.querySelectorAll('.quiz-options button').forEach(b => {
+        if (b.textContent === correctWord.word) b.classList.add('show-correct');
+        b.onclick = null;
+      });
+      if (isCorrect) {
+        btn.classList.add('selected-correct');
+        document.getElementById('quizFeedback').textContent = `✅ 正确！"${correctWord.word}" 就是"${correctWord.m}"`;
+        document.getElementById('quizFeedback').className = 'quiz-feedback correct';
+        D.dailyCorrect++; D.totalCorrect++;
+      } else {
+        btn.classList.add('selected-wrong');
+        document.getElementById('quizFeedback').innerHTML = `❌ 选错了。"<span style="color:#ffd93d">${correctWord.word}</span>" 才是"${correctWord.m}"`;
+        document.getElementById('quizFeedback').className = 'quiz-feedback wrong';
+        if (!D.wrongWords[correctWord.word]) D.wrongWords[correctWord.word] = { word: correctWord.word, meaning: correctWord.m, count: 0, sentence: correctWord.s };
+        D.wrongWords[correctWord.word].count++;
+        D.totalWrong++;
+      }
+      D.dailyCount++; D.totalLearned++;
+      document.getElementById('btnNextQuiz').style.display = 'inline-block';
+      saveData();
+    };
+    el.appendChild(btn);
+  });
+}
+
+function nextQuizWord() {
+  currentIdx++;
+  if (currentIdx >= studyWords.length) { showLevelDone(); return; }
+  showQuizPhase();
+}
+
+// ===== 关卡完成 =====
+function showLevelDone() {
+  document.getElementById('browseArea').style.display = 'none';
+  document.getElementById('spellArea').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('levelDone').style.display = 'block';
+  const total = studyWords.length;
+  const c = spellResults.filter(r => r.correct).length;
+  const w = spellResults.filter(r => !r.correct).length;
+  document.getElementById('doneTotal').textContent = total;
+  document.getElementById('doneCorrect').textContent = c;
+  document.getElementById('doneWrong').textContent = w;
+  const allCorrect = spellResults.length > 0 && w === 0;
+  const alreadyCompleted = D.completedLevels.includes(currentLevelId);
+  if (allCorrect && !alreadyCompleted) {
+    D.completedLevels.push(currentLevelId);
+    const prog = D.levelProgress[currentLevelId] || { done: [] };
+    prog.done = studyWords.map((_,i) => i);
+    D.levelProgress[currentLevelId] = prog;
+    saveData();
+    document.getElementById('doneTitle').textContent = '🎉 完美通关！';
+    document.getElementById('doneSub').textContent = '全部拼写正确，太厉害了！';
+  } else {
+    const prog = D.levelProgress[currentLevelId] || { done: [] };
+    for (const r of spellResults) {
+      if (r.correct) {
+        const idx = studyWords.findIndex(sw => sw.word === r.word);
+        if (idx >= 0 && !prog.done.includes(idx)) prog.done.push(idx);
+      }
+    }
+    D.levelProgress[currentLevelId] = prog;
+    saveData();
+    document.getElementById('doneTitle').textContent = alreadyCompleted ? '✅ 复习完成' : '📖 本轮完成';
+    document.getElementById('doneSub').textContent = allCorrect ? '' : `有 ${w} 个单词需要继续练习，已加入错词本`;
+  }
+  const canNext = currentLevelId < 6 && !practiceMode;
+  document.getElementById('btnNextLevel').style.display = canNext ? 'inline-block' : 'none';
+}
+
+function goNextLevel() { startLevel(currentLevelId + 1); }
+function leaveStudy() { showPage('levels'); renderLevels(); }
+
+// ======================================================================
+// 错词本
+// ======================================================================
+function renderWrongBook() {
+  const keys = Object.keys(D.wrongWords);
+  document.getElementById('wrongTotal').textContent = `共 ${keys.length} 个`;
+  const el = document.getElementById('wrongList'); el.innerHTML = '';
+  if (keys.length === 0) { el.innerHTML = '<div class="wrong-empty">✅ 暂无错词，继续保持！</div>'; return; }
+  keys.sort((a,b) => D.wrongWords[b].count - D.wrongWords[a].count || a.localeCompare(b));
+  for (const k of keys) {
+    const w = D.wrongWords[k];
+    const div = document.createElement('div');
+    div.className = 'wrong-item';
+    div.innerHTML = `<div><div class="w">${w.word}</div><div class="m">${w.meaning}</div></div><div class="t">错 ${w.count} 次</div>`;
+    el.appendChild(div);
+  }
+}
+
+function practiceWrong() {
+  const keys = Object.keys(D.wrongWords);
+  if (keys.length === 0) { alert('错词本是空的！'); return; }
+  practiceMode = true;
+  studyWords = keys.map(k => {
+    const found = WORD_DATA.find(w => w.word === k);
+    return found || { word: k, p: '', m: D.wrongWords[k].meaning, s: D.wrongWords[k].sentence || '', t: '' };
+  });
+  for (let i = studyWords.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [studyWords[i], studyWords[j]] = [studyWords[j], studyWords[i]];
+  }
+  currentWords = studyWords;
+  currentIdx = 0; spellResults = [];
+  showPage('study');
+  document.querySelectorAll('.study-mode-tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tabSpell').classList.add('active');
+  showSpellPhase();
+}
+
+function clearWrong() {
+  if (Object.keys(D.wrongWords).length === 0) return;
+  if (confirm('确定清空所有错词记录吗？')) { D.wrongWords = {}; saveData(); renderWrongBook(); }
+}
+
+// ======================================================================
+// 统计
+// ======================================================================
+function refreshStats() {
+  const tl = D.totalLearned || 0, tc = D.totalCorrect || 0, tw = D.totalWrong || 0;
+  const acc = tl > 0 ? Math.round(tc/tl*100) : 0;
+  document.getElementById('statTotalLearned').textContent = tl;
+  document.getElementById('statAccuracy').textContent = acc + '%';
+  document.getElementById('statToday').textContent = D.dailyCount || 0;
+  document.getElementById('statWrongCount').textContent = Object.keys(D.wrongWords).length;
+  document.getElementById('statLevelDone').textContent = `${D.completedLevels.length}/6`;
+  document.getElementById('statStreak').textContent = D.streak || 0;
+  document.getElementById('statTotalWords').textContent = WORD_DATA.length;
+  const pct = Math.round(tl / WORD_DATA.length * 100);
+  document.getElementById('globalBar').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('globalPct').textContent = pct + '%';
+}
+
+function resetAllData() {
+  if (confirm('确定重置所有数据？此操作不可恢复！')) {
+    if (confirm('再次确认：所有进度将被清空。')) {
+      D = getDefaultData(); saveData();
+      refreshStats(); renderLevels(); renderWrongBook(); refreshHome();
+    }
+  }
+}
+
+// ======================================================================
+// 键盘快捷键
+// ======================================================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const study = document.getElementById('page-study');
+    if (!study.classList.contains('active')) return;
+    if (document.getElementById('browseArea').style.display !== 'none' &&
+        document.getElementById('browseArea').style.display !== '') {
+      browseNext(); return;
+    }
+    if (document.getElementById('spellArea').style.display !== 'none' &&
+        document.getElementById('spellArea').style.display !== '') {
+      const input = document.getElementById('spellInput');
+      if (!input.disabled) { checkSpell(); return; }
+      const btnNext = document.getElementById('btnNextSpell');
+      if (btnNext.style.display !== 'none') { nextStudyWord(); return; }
+    }
+    if (document.getElementById('quizArea').style.display !== 'none' &&
+        document.getElementById('quizArea').style.display !== '') {
+      const btnNext = document.getElementById('btnNextQuiz');
+      if (btnNext.style.display !== 'none') { nextQuizWord(); return; }
+    }
+  }
+  if (e.key === 'ArrowRight') {
+    if (document.getElementById('browseArea').style.display !== 'none') browseNext();
+  }
+  if (e.key === 'ArrowLeft') {
+    if (document.getElementById('browseArea').style.display !== 'none') browsePrev();
+  }
+  if (e.key === 'Escape') {
+    if (document.getElementById('page-study').classList.contains('active')) {
+      if (confirm('确定退出吗？进度会保留。')) leaveStudy();
+    }
+  }
+});
+
+// ======================================================================
+// 初始化
+// ======================================================================
+loadData();
+renderLevels();
+refreshHome();
+</script>
+</body>
+</html>
